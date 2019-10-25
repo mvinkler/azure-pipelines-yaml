@@ -10,6 +10,7 @@ pool:
   vmImage: 'macOS-10.14'
 
 variables:
+  System.Debug: True
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
   GOROOT: '/usr/local/go1.13' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
