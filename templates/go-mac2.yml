@@ -6,9 +6,9 @@ trigger:
 
 strategy:
   matrix:
-    linux:
-      imageName: ubuntu-16.04
-      gorootDir: /usr/local
+  #  linux:
+  #    imageName: ubuntu-16.04
+  #    gorootDir: /usr/local
     mac:
       imageName: macos-10.13
       gorootDir: /usr/local
@@ -21,11 +21,21 @@ variables:
   GOROOT: $(gorootDir)/go
   GOPATH: $(system.defaultWorkingDirectory)/gopath
   GOBIN:  $(GOPATH)/bin
+  GOGIT:  $(system.defaultWorkingDirectory)/git
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)'
   # TODO: modules should be the default in Go 1.13, so this won't be needed
   GO111MODULE: on
 
 steps:
+  - bash: |
+      printf "Using go at: $(which go)\n"
+      printf "Go version: $(go version)\n"
+      printf "\n\nGo environment:\n\n"
+      go env
+      printf "\n\nSystem environment:\n\n"
+      env
+    displayName: Print Go version and environment
+
   - bash: |
       latestGo=$(curl "https://golang.org/VERSION?m=text")
       echo "##vso[task.setvariable variable=LATEST_GO]$latestGo"
@@ -78,9 +88,22 @@ steps:
       env
     displayName: Print Go version and environment
 
+
+  - checkout: github://openshift/knative-client@v0.9.0
+    path: knative-client   # will checkout at $(Pipeline.Workspace)/knative-client
+
+  - bash: |
+      mkdir -p '$(GOGIT)'
+      printf "Using go at: $(which go)\n"
+      printf "Go version: $(go version)\n"
+      printf "\n\nGo environment:\n\n"
+      go env
+      printf "\n\nSystem environment:\n\n"
+      env
+    displayName: Git
+
   - script: |
       go version
-      go get -v -t -d ./...
       if [ -f Gopkg.toml ]; then
           curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           dep ensure
