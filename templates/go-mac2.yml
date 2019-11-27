@@ -10,9 +10,9 @@ pool:
 variables:
   System.Debug: True
   GOROOT: /usr/local/go
-  GOPATH: $(system.defaultWorkingDirectory)/gopath
+  GOPATH: $(system.defaultWorkingDirectory)/go
   GOBIN:  $(GOPATH)/bin
-  GOGIT:  $(system.defaultWorkingDirectory)/git
+  #GOGIT:  $(system.defaultWorkingDirectory)/git
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)'
   # TODO: modules should be the default in Go 1.13, so this won't be needed
   #GO111MODULE: on
@@ -26,6 +26,9 @@ resources:
     endpoint: mvinkler
 
 steps:
+  - checkout: knative-client # will checkout at $(Pipeline.Workspace)/knative-client
+    displayName: Checkout knative-client repo
+
   - bash: |
       printf "Using go at: $(which go)\n"
       printf "Go version: $(go version)\n"
@@ -41,24 +44,18 @@ steps:
       echo "Latest Go version: $latestGo"
     displayName: "Get latest Go version"
 
+
+  # Install Go
   - bash: |
       sudo rm -f $(which go)
       echo '##vso[task.prependpath]$(GOBIN)' 
       echo '##vso[task.prependpath]$(GOROOT)/bin'
       mkdir -p '$(modulePath)'
       mkdir -p '$(GOPATH)'
-      # shopt -s extglob
-      # shopt -s dotglob
-      # mv !(gopath) '$(modulePath)'
-    displayName: Remove old Go, set GOBIN/GOROOT, and move project into GOPATH
-
-  # Install Go (this varies by platform)
-
-  - bash: |
       wget "https://dl.google.com/go/$(LATEST_GO).darwin-amd64.tar.gz"
       sudo tar -C $(gorootDir) -xzf "$(LATEST_GO).darwin-amd64.tar.gz"
     condition: eq( variables['Agent.OS'], 'Darwin' )
-    displayName: Install Go on macOS
+    displayName: Remove old Go, set GOBIN/GOROOT, Install Go on macOS
 
   # TODO: When this issue is fixed, replace with installer script:
   # https://github.com/golangci/golangci-lint/issues/472
@@ -75,7 +72,7 @@ steps:
     displayName: Print Go version and environment
 
 
-  - checkout: knative-client # will checkout at $(Pipeline.Workspace)/knative-client
+
 
   - bash: |
       mkdir -p '$(GOGIT)'
