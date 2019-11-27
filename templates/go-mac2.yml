@@ -12,14 +12,12 @@ strategy:
     mac:
       imageName: macos-10.13
       gorootDir: /usr/local
-    windows:
-      imageName: windows-2019
-      gorootDir: C:\
 
 pool:
   vmImage: $(imageName)
 
 variables:
+  System.Debug: True
   GOROOT: $(gorootDir)/go
   GOPATH: $(system.defaultWorkingDirectory)/gopath
   GOBIN:  $(GOPATH)/bin
@@ -83,6 +81,5 @@ steps:
   - script: |
       go get -v -t -d ./...
       golangci-lint run -E gofmt -E goimports -E misspell
-      go test -race ./...
     workingDirectory: '$(modulePath)'
     displayName: Run tests
