@@ -52,12 +52,12 @@ steps:
 
   - bash: |
       sudo rm -f $(which go)
-      echo '##vso[task.prependpath]$(GOBIN)'
+      echo '##vso[task.prependpath]$(GOBIN)' 
       echo '##vso[task.prependpath]$(GOROOT)/bin'
       mkdir -p '$(modulePath)'
-      shopt -s extglob
-      shopt -s dotglob
-      mv !(gopath) '$(modulePath)'
+      # shopt -s extglob
+      # shopt -s dotglob
+      # mv !(gopath) '$(modulePath)'
     displayName: Remove old Go, set GOBIN/GOROOT, and move project into GOPATH
 
   # Install Go (this varies by platform)
