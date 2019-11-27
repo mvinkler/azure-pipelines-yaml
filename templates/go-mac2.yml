@@ -9,10 +9,10 @@ pool:
 
 variables:
   System.Debug: True
-  GOROOT: /usr/local/go
+  gorootDir: /usr/local
+  GOROOT: $(gorootDir)/go
   GOPATH: $(system.defaultWorkingDirectory)/go
   GOBIN:  $(GOPATH)/bin
-  #GOGIT:  $(system.defaultWorkingDirectory)/git
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)'
   # TODO: modules should be the default in Go 1.13, so this won't be needed
   #GO111MODULE: on
